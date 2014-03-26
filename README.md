@@ -36,7 +36,7 @@ app.configure( function() {
 } );
 ```
 
-The middleware wraps `res.render()` so that it can automatically populate `res.locals.cartero_js` and `res.locals.cartero_css` with the appropriate values each time a template is rendered. Templates can then just dump `cartero_js` and `cartero_css` to load all the js / css assets they require.
+The middleware wraps `res.render()` so that it can automatically set `res.locals.cartero_js` and `res.locals.cartero_css` each time a template is rendered. Templates can then just dump `cartero_js` and `cartero_css` to load all the js / css assets they require.
 
 ```jade
 doctype 5
