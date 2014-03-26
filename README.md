@@ -1,4 +1,4 @@
-Express middleware for [Cartero](https://github.com/rotundasoftware/cartero). Automatically populates `res.local` with the `script` and `link` tags needed to load all the js / css assets for view being rendered.
+Express middleware for [Cartero](https://github.com/rotundasoftware/cartero). Automatically populates `res.locals.cartero_js` and `res.locals.cartero_css` with the `script` and `link` tags (respectively) needed to load all the js / css assets for view being rendered.
 
 ## Usage
 
@@ -27,7 +27,26 @@ app.configure( function() {
 	app.use( carteroMiddleware( h ) );			// install the middleware
 
 	// ...
+
+	app.get( '/hello', function( req, res ) {
+		res.render( 'hello.jade' );
+	} );
 } );
+```
+
+When `hello.jade` is rendered, we can just dump `cartero_js` and `cartero_css` to load our assets.
+
+```jade
+doctype 5
+html(lang="en")
+    head
+        title login
+        | !{cartero_js}
+        | !{cartero_css} 
+    body
+        | !{cartero_tmpl} 
+        h1 People List
+        // ...
 ```
 
 The middleware wraps the existing `res.render()` function, so it has an opportunity to populate `cartero_js` and `cartero_css` with the appropriate values each time a template is rendered.
