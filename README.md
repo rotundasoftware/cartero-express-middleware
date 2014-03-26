@@ -1,4 +1,4 @@
-Express middleware for [Cartero](https://github.com/rotundasoftware/cartero). Automatically populates `res.locals.cartero_js` and `res.locals.cartero_css` with the `script` and `link` tags (respectively) needed to load all the js / css assets for view being rendered.
+Express middleware for [Cartero](https://github.com/rotundasoftware/cartero). Automatically populates `res.locals.cartero_js` and `res.locals.cartero_css` with the `script` and `link` tags to load all the js / css assets for view being rendered.
 
 ## Usage
 
