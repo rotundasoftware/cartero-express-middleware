@@ -1,29 +1,28 @@
 {
-  "name": "cartero-express-hook",
+  "name": "cartero-express-middleware",
   "description": "Express middleware for Cartero.",
-  "version": "0.1.2",
+  "version": "0.1.0",
   "author": {
     "name": "rotundasoftware",
     "email": "support@rotundasoftware.com"
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/rotundasoftware/cartero-express-hook.git"
+    "url": "git://github.com/rotundasoftware/cartero-express-middleware.git"
   },
   "bugs": {
-    "url": "https://github.com/rotundasoftware/cartero-express-hook/issues"
+    "url": "https://github.com/rotundasoftware/cartero-express-middleware/issues"
   },
   "licenses": [
     {
       "type": "MIT",
-      "url": "https://github.com/go-oleg/bundler/blob/master/LICENSE-MIT"
+      "url": "https://github.com/rotundasoftware/cartero-express-middleware/blob/master/LICENSE"
     }
   ],
-  "main": "middleware.js",
+  "main": "index.js",
   "engines": {
     "node": ">= 0.8.0"
   },
-  "devDependencies": {},
   "keywords": [],
   "dependencies": {
     "express": "~3.4.8"
