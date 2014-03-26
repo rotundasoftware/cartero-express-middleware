@@ -1,8 +1,10 @@
-Express middleware for [Cartero](https://github.com/rotundasoftware/cartero). Automatically populates `res.locals.cartero_js` and `res.locals.cartero_css` with the `script` and `link` tags to load all the js / css assets for view being rendered.
+# cartero-express-middleware
+
+Express middleware for [Cartero](https://github.com/rotundasoftware/cartero). Automatically populates `res.locals.cartero_js` and `res.locals.cartero_css` with `script` and `link` tags that load all the js / css assets for view being rendered.
 
 ## Usage
 
-After runnning [Cartero](https://github.com/rotundasoftware/cartero), initialize an instance of the [Cartero node hook](https://github.com/rotundasoftware/cartero-node-hook), and then install the middleware , passing it the hook instance.
+After runnning [Cartero](https://github.com/rotundasoftware/cartero), initialize an instance of the [Cartero node hook](https://github.com/rotundasoftware/cartero-node-hook), and then install the middleware, passing it the hook instance.
 
 ```javascript
 // app.js
