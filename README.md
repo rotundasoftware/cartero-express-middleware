@@ -18,12 +18,12 @@ app.configure( function() {
 	app.use( express.static( path.join( __dirname, "static" ) ) );
 	// ...
 
-	var h = hook(										// initialize a cartero hook
+	var h = hook(									// initialize a cartero hook
 		path.join( __dirname, "views" ),			// views directory
 		path.join( __dirname, "static/assets" ),	// output directory
 		{ outputDirUrl : 'assets/' }				// output directory base url
 	);
-	
+
 	app.use( carteroMiddleware( h ) );			// install the middleware
 
 	// ...
