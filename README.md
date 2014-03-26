@@ -2,7 +2,7 @@ Express middleware for [Cartero](https://github.com/rotundasoftware/cartero). Au
 
 ## Usage
 
-After runnning [Cartero](https://github.com/rotundasoftware/cartero), install the middleware when your application is initialized, passing it the an instance of the [Cartero node hook](https://github.com/rotundasoftware/cartero-node-hook).
+After runnning [Cartero](https://github.com/rotundasoftware/cartero), initialize an instance of the [Cartero node hook](https://github.com/rotundasoftware/cartero-node-hook), and then install the middleware , passing it the hook instance.
 
 ```javascript
 // app.js
@@ -18,13 +18,13 @@ app.configure( function() {
 	app.use( express.static( path.join( __dirname, "static" ) ) );
 	// ...
 
-	h = hook(								// initialize a cartero hook
-		path.join( __dirname, "views" ),
-		path.join( __dirname, "static/assets" ),
-		{ outputDirUrl : 'assets/' }
+	h = hook(										// initialize a cartero hook
+		path.join( __dirname, "views" ),			// views directory
+		path.join( __dirname, "static/assets" ),	// output directory
+		{ outputDirUrl : 'assets/' }				// output directory base url
 	);
 
-	app.use( carteroMiddleware( hook ) );	// install the middleware
+	app.use( carteroMiddleware( hook ) );			// install the middleware
 
 	// ...
 } );
