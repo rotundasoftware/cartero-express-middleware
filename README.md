@@ -16,7 +16,7 @@ After runnning [Cartero](https://github.com/rotundasoftware/cartero), initialize
 
 var app = express();
 var hook = require( "cartero-node-hook" );
-var carteroMiddleware = require( "cartero-express-hook" );
+var carteroMiddleware = require( "cartero-express-middleware" );
 // ...
 
 app.configure( function() {
