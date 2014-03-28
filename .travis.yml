@@ -1,0 +1,7 @@
+language: node_js
+node_js:
+  - "0.10"
+before_script:
+  - node test/example1/app.js &
+  - sleep 5
+script: phantomjs test/test.js

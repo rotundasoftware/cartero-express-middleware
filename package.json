@@ -26,5 +26,11 @@
   "keywords": [],
   "dependencies": {
     "express": "~3.4.8"
+  },
+  "devDependencies": {
+    "cartero-node-hook": "^0.2.1",
+    "express": "^3.4.8",
+    "jade": "^1.3.0",
+    "underscore": "^1.6.0"
   }
 }
