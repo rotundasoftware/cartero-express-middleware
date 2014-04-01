@@ -6,7 +6,11 @@ var sawExpectedConsoleLogs = {
 	"we got underscore!" : false
 };
 
-page.open('http://localhost:3000/page1', function() {
+page.open('http://localhost:3000/page1', function( status ) {
+	if( status !== "success" ) {
+		console.log( "failed to load page: " + status );
+		phantom.exit( 1 );
+	}
 });
 
 page.onConsoleMessage = function(msg, lineNum, sourceId) {
