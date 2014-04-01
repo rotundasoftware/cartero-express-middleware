@@ -40,20 +40,24 @@ module.exports = function( hook, populateRes ) {
 				absolutePath = view.path;
 			}
 
-			populateResDefault( absolutePath, hook, res );
+			populateResDefault( absolutePath, hook, res, function( err ) {
+				if( err ) return next( err );
 
-			oldRender.apply( res, _arguments );
+				oldRender.apply( res, _arguments );
+			} );
 		};
 
 		next();
 	};
 
-	function populateResDefault( viewAbsPath, hook, res ) {
+	function populateResDefault( viewAbsPath, hook, res, cb ) {
 		hook.getViewAssetHTMLTags( viewAbsPath, function( err, result ) {
-			if( err ) return; // view does not exist
+			if( err ) return cb( err ); // view does not exist
 
 			res.locals.cartero_js = result.script;
 			res.locals.cartero_css = result.style;
+
+			return cb();
 		} );
 	}
 };
