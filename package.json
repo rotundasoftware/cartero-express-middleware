@@ -19,7 +19,7 @@
       "url": "https://github.com/rotundasoftware/cartero-express-middleware/blob/master/LICENSE"
     }
   ],
-  "main": "middleware.js",
+  "main": "index.js",
   "engines": {
     "node": ">= 0.8.0"
   },
