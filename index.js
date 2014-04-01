@@ -13,7 +13,9 @@
 	path = require( "path" ),
 	View = require('express/lib/view');
 
-module.exports = function( hook ) {
+module.exports = function( hook, populateRes ) {
+	if( typeof( populateRes ) !== 'function' ) populateRes = populateResDefault;
+
 	return function( req, res, next ) {
 		var oldRender = res.render;
 
@@ -38,18 +40,20 @@ module.exports = function( hook ) {
 				absolutePath = view.path;
 			}
 
-			hook.getViewAssetHTMLTags( absolutePath, function( err, result ) {
-				if( err )
-					return next( err );
+			populateResDefault( absolutePath, hook, res );
 
-				res.locals.cartero_js = result.script;
-				res.locals.cartero_css = result.style;
-				oldRender.apply( res, _arguments );
-			} );
-
-			
+			oldRender.apply( res, _arguments );
 		};
 
 		next();
 	};
+
+	function populateResDefault( viewAbsPath, hook, res ) {
+		hook.getViewAssetHTMLTags( viewAbsPath, function( err, result ) {
+			if( err ) return; // view does not exist
+
+			res.locals.cartero_js = result.script;
+			res.locals.cartero_css = result.style;
+		} );
+	}
 };
