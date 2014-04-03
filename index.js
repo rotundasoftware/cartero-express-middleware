@@ -13,8 +13,10 @@
 	path = require( "path" ),
 	View = require('express/lib/view');
 
-module.exports = function( hook, populateRes ) {
-	if( typeof( populateRes ) !== 'function' ) populateRes = populateResDefault;
+module.exports = function( hook, opts ) {
+	opts = opts || {};
+
+	if( typeof( opts.populateRes ) !== 'function' ) opts.populateRes = populateResDefault;
 
 	return function( req, res, next ) {
 		var oldRender = res.render;
@@ -32,15 +34,20 @@ module.exports = function( hook, populateRes ) {
 			if( ! existsSync( absolutePath ) ) {
 				// if that doesn't work, resolve it using same method as app.render, which adds
 				// extensions based on the view engine being used, etc.
-				var view = new View( name, {
-					defaultEngine: app.get( "view engine" ),
-					root: app.get( "views" ),
-					engines: app.engines
-				} );
-				absolutePath = view.path;
+				try {
+					var view = new View( name, {
+						defaultEngine: app.get( "view engine" ),
+						root: app.get( "views" ),
+						engines: app.engines
+					} );
+					absolutePath = view.path;
+				} catch( err ) {
+					// if there is an error, give up, this view probably does not exist
+					return oldRender.apply( res, _arguments );
+				}
 			}
 
-			populateResDefault( absolutePath, hook, res, function( err ) {
+			opts.populateRes( absolutePath, hook, res, function( err ) {
 				if( err ) return next( err );
 
 				oldRender.apply( res, _arguments );
