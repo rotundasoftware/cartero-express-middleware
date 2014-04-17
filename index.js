@@ -23,31 +23,35 @@ module.exports = function( hook, opts ) {
 
 		// for each request, wrap the render function so that we can execute our own code 
 		// first to populate the `cartero_js`, `cartero_css`
-		res.render = function( name, options ) {
+		res.render = function( viewPath, parcelPath ) {
 			var _arguments = arguments;
 			var app = req.app;
-			var absolutePath;
+			var viewAbsolutePath;
 			var existsSync = fs.existsSync ? fs.existsSync : path.existsSync;
 			
-			// try to find the absolute path of the template by resolving it against the views folder
-			absolutePath = path.resolve( app.get( "views" ), name );
-			if( ! existsSync( absolutePath ) ) {
-				// if that doesn't work, resolve it using same method as app.render, which adds
-				// extensions based on the view engine being used, etc.
-				try {
-					var view = new View( name, {
-						defaultEngine: app.get( "view engine" ),
-						root: app.get( "views" ),
-						engines: app.engines
-					} );
-					absolutePath = view.path;
-				} catch( err ) {
-					// if there is an error, give up, this view probably does not exist
-					return oldRender.apply( res, _arguments );
+			if( ! parcelPath ) {
+				// try to find the absolute path of the template by resolving it against the views folder
+				viewAbsolutePath = path.resolve( app.get( "views" ), viewPath );
+				if( ! existsSync( viewAbsolutePath ) ) {
+					// if that doesn't work, resolve it using same method as app.render, which adds
+					// extensions based on the view engine being used, etc.
+					try {
+						var view = new View( viewPath, {
+							defaultEngine: app.get( "view engine" ),
+							root: app.get( "views" ),
+							engines: app.engines
+						} );
+						viewAbsolutePath = view.path;
+					} catch( err ) {
+						// if there is an error, give up, this view probably does not exist
+						return oldRender.apply( res, _arguments );
+					}
 				}
+
+				parcelPath = path.dirname( viewAbsolutePath );
 			}
 
-			opts.populateRes( absolutePath, hook, res, function( err ) {
+			opts.populateRes( parcelPath, hook, res, function( err ) {
 				if( err ) return next( err );
 
 				oldRender.apply( res, _arguments );
@@ -57,12 +61,13 @@ module.exports = function( hook, opts ) {
 		next();
 	};
 
-	function populateResDefault( viewAbsPath, hook, res, cb ) {
-		hook.getViewAssetHTMLTags( viewAbsPath, function( err, result ) {
-			if( err ) return cb( err ); // view does not exist
-
-			res.locals.cartero_js = result.script;
-			res.locals.cartero_css = result.style;
+	function populateResDefault( parcelPath, hook, res, cb ) {
+		hook.getParcelTags( parcelPath, function( err, scriptTags, styleTags ) {
+			if( err ) return cb(); // parcel does not exist
+			console.log( parcelPath );
+			
+			res.locals.cartero_js = scriptTags;
+			res.locals.cartero_css = styleTags;
 
 			return cb();
 		} );
