@@ -1,7 +1,7 @@
 {
   "name": "cartero-express-middleware",
   "description": "Express middleware for Cartero.",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "author": {
     "name": "rotundasoftware",
     "email": "support@rotundasoftware.com"
@@ -23,7 +23,9 @@
   "engines": {
     "node": ">= 0.8.0"
   },
-  "keywords": [ "cartero" ],
+  "keywords": [
+    "cartero"
+  ],
   "dependencies": {
     "express": "~3.4.8"
   },
