@@ -2,7 +2,7 @@
 
 Express middleware for [cartero](https://github.com/rotundasoftware/cartero). Overrides res.render with a method that accepts an additional argument, the path to a parcel. The `res.locals.cartero_js` and `res.locals.cartero_css` variables are then populated with the `script` and `link` tags for that parcel.
 
-The path of the parcel defaults to the directory of the view that is being rendered, so if you use your views folder to hold your parcels as recommended in the [cartero docs](https://github.com/rotundasoftware/cartero#packages-and-parcels), `res.locals.cartero_js` and `res.locals.cartero_css` are conveniently set to the script and link tags needed for the view being rendered.
+The path of the parcel defaults to the directory of the view that is being rendered, so if you use your views folder to hold your parcels as recommended in the [cartero docs](https://github.com/rotundasoftware/cartero#packages-and-parcels), `res.locals.cartero_js` and `res.locals.cartero_css` are set to the script and link tags needed for the view being rendered.
 
 ## Installation
 ```
@@ -38,7 +38,7 @@ app.configure( function() {
 	// ...
 
 	app.get( '/hello', function( req, res ) {
-		res.render( 'hello/hello.jade' );
+		res.render( 'hello/hello.jade', {}, '/usr/parcels/hello' );
 	} );
 } );
 ```

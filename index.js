@@ -20,15 +20,16 @@ module.exports = function( hook, opts ) {
 
 	return function( req, res, next ) {
 		var oldRender = res.render;
+		var app = req.app;
 
 		// for each request, wrap the render function so that we can execute our own code 
 		// first to populate the `cartero_js`, `cartero_css`
-		res.render = function( viewPath, parcelPath ) {
-			var _arguments = arguments;
-			var app = req.app;
+		res.render = function( viewPath, options, parcelPath, cb ) {
 			var viewAbsolutePath;
 			var existsSync = fs.existsSync ? fs.existsSync : path.existsSync;
-			
+
+			if( ! options ) options = {};
+
 			if( ! parcelPath ) {
 				// try to find the absolute path of the template by resolving it against the views folder
 				viewAbsolutePath = path.resolve( app.get( "views" ), viewPath );
@@ -44,17 +45,19 @@ module.exports = function( hook, opts ) {
 						viewAbsolutePath = view.path;
 					} catch( err ) {
 						// if there is an error, give up, this view probably does not exist
-						return oldRender.apply( res, _arguments );
+						return oldRender.call( res, viewPath, options, cb );
 					}
 				}
 
 				parcelPath = path.dirname( viewAbsolutePath );
 			}
+			else
+				parcelPath = path.resolve( app.get( 'views' ), parcelPath );
 
 			opts.populateRes( parcelPath, hook, res, function( err ) {
 				if( err ) return next( err );
 
-				oldRender.apply( res, _arguments );
+				oldRender.call( res, viewPath, options, cb );
 			} );
 		};
 
@@ -63,9 +66,11 @@ module.exports = function( hook, opts ) {
 
 	function populateResDefault( parcelPath, hook, res, cb ) {
 		hook.getParcelTags( parcelPath, function( err, scriptTags, styleTags ) {
-			if( err ) return cb(); // parcel does not exist
-			console.log( parcelPath );
-			
+			if( err ) {
+				console.log( 'Could not find or load parcel at ' + parcelPath );
+				return cb(); // parcel probably does not exist. not a bid deal
+			}
+
 			res.locals.cartero_js = scriptTags;
 			res.locals.cartero_css = styleTags;
 
