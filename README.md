@@ -1,8 +1,12 @@
 # cartero-express-middleware
 
-Express middleware for [cartero](https://github.com/rotundasoftware/cartero). Overrides res.render with a method that accepts an additional argument, the path to a parcel. The `res.locals.cartero_js` and `res.locals.cartero_css` variables are then populated with the `script` and `link` tags for that parcel.
+Express middleware for [cartero](https://github.com/rotundasoftware/cartero). Overrides res.render with a method that accepts an additional argument, the path to a parcel.
 
-The path of the parcel defaults to the directory of the view that is being rendered, so if you use your views folder to hold your parcels as recommended in the [cartero docs](https://github.com/rotundasoftware/cartero#packages-and-parcels), `res.locals.cartero_js` and `res.locals.cartero_css` are set to the script and link tags needed for the view being rendered.
+* `res.locals.cartero_js` is populated with the `script` tags for to load the js for the parcel.
+* `res.locals.cartero_css` is populated with the `link` tags for to load the css for the parcel.
+* `res.locals.cartero_url` is set to a function that takes a single argument, the path of an asset (relative to the parcel), and resolves it to the asset's url.
+
+The path of the parcel defaults to the directory of the view that is being rendered, so if you use your views folder to hold your parcels as recommended in the [cartero docs](https://github.com/rotundasoftware/cartero#packages-and-parcels) and [tutorial](https://github.com/rotundasoftware/cartero-tutorial), the variables are set to the appropriate values for parcel of the view being rendered.
 
 ## Installation
 ```
@@ -53,35 +57,16 @@ html(lang="en")
         | !{cartero_js}
         | !{cartero_css} 
     body
-        | !{cartero_tmpl} 
         h1 People List
         // ...
 ```
 
-### Customization
+Image urls (or the urls of other assets) can be found usign the `cartero_url` function:
 
-The middleware also takes an `opts` argument, which can contain an async function `populateRes` that populates `res.locals` with the appropriate values. It should be of the signature `function( parcelPath, hook, res, cb )`. For example, to include templates:
-
-```javascript
-app.use( carteroMiddleware( h, {
-	populateRes : function( parcelPath, hook, res, cb ) {
-		hook.getParcelTags( parcelPath, function( err, result ) {
-			if( err ) return cb( err ); // view does not exist
-
-			res.locals.cartero_js = result.script;
-			res.locals.cartero_css = result.style;
-
-			hook.getParcelAssets( parcelPath, function( err, result ) {
-				var templateContent = result.template.reduce( function( memo, thisTemplatePath ) {
-					return memo + fs.readFileSync( thisTemplatePath, 'utf8' );
-				}, '' );
-
-				res.locals.cartero_tmpl = templateContent;
-				return cb();
-			} );
-		} );
-	}
-} ) );
+```
+body
+        h1 People List
+        img(src=cartero_url('./my-image.png'))
 ```
 
 ## Contributors

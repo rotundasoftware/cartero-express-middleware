@@ -9,9 +9,8 @@
  * 
  */
 
- var fs = require( "fs" ),
-	path = require( "path" ),
-	View = require('express/lib/view');
+var fs = require( "fs" );
+var path = require( "path" );
 
 module.exports = function( hook, opts ) {
 	opts = opts || {};
@@ -24,29 +23,15 @@ module.exports = function( hook, opts ) {
 
 		// for each request, wrap the render function so that we can execute our own code 
 		// first to populate the `cartero_js`, `cartero_css`
-		res.render = function( viewPath, options, parcelPath, cb ) {
-			var viewAbsolutePath;
-			var existsSync = fs.existsSync ? fs.existsSync : path.existsSync;
-
+		res.render = function( viewName, options, parcelPath, cb ) {
 			if( ! options ) options = {};
 
 			if( ! parcelPath ) {
 				// try to find the absolute path of the template by resolving it against the views folder
-				viewAbsolutePath = path.resolve( app.get( "views" ), viewPath );
-				if( ! existsSync( viewAbsolutePath ) ) {
-					// if that doesn't work, resolve it using same method as app.render, which adds
-					// extensions based on the view engine being used, etc.
-					try {
-						var view = new View( viewPath, {
-							defaultEngine: app.get( "view engine" ),
-							root: app.get( "views" ),
-							engines: app.engines
-						} );
-						viewAbsolutePath = view.path;
-					} catch( err ) {
-						// if there is an error, give up, this view probably does not exist
-						return oldRender.call( res, viewPath, options, cb );
-					}
+				var viewAbsolutePath = findAbsoluteViewPath( viewName, app );
+				if( ! viewAbsolutePath ) {
+					oldRender.call( res, viewName, options, cb );
+					return;
 				}
 
 				parcelPath = path.dirname( viewAbsolutePath );
@@ -57,7 +42,7 @@ module.exports = function( hook, opts ) {
 			opts.populateRes( parcelPath, hook, res, function( err ) {
 				if( err ) return next( err );
 
-				oldRender.call( res, viewPath, options, cb );
+				oldRender.call( res, viewName, options, cb );
 			} );
 		};
 
@@ -73,8 +58,40 @@ module.exports = function( hook, opts ) {
 
 			res.locals.cartero_js = scriptTags;
 			res.locals.cartero_css = styleTags;
+			res.locals.cartero_url = function( filePath ) {
+				filePath = path.resolve( parcelPath, filePath );
+				return hook.getAssetUrl( filePath );
+			};
 
 			return cb();
 		} );
+	}
+
+	function findAbsoluteViewPath( viewName, app ) {
+		var existsSync = fs.existsSync ? fs.existsSync : path.existsSync;
+
+		var viewPath = path.resolve( app.get( "views" ), viewName );
+		if( existsSync( viewPath ) && fs.statSync( viewPath ).isFile() ) return viewPath;
+
+		// if that doesn't work, resolve it using same method as app.render, which adds
+		// extensions based on the view engine being used, etc.
+		var ext = path.extname( viewName );
+		var defaultEngine = app.get( "view engine" );
+
+		if( ! ext && ! defaultEngine )
+			throw new Error( 'No default engine was specified and no extension was provided.' );
+		if( ! ext ) viewName += (ext = ('.' != defaultEngine[0] ? '.' : '') + defaultEngine);
+
+		// <path>.<engine>
+		viewPath = path.resolve( app.get( "views" ), viewName );
+		if( existsSync( viewPath ) && fs.statSync( viewPath ).isFile() ) return viewPath;
+
+		// <path>/index.<engine>
+		viewPath = path.join(path.dirname(viewPath), path.basename(viewPath, ext), 'index' + ext);
+		if( existsSync( viewPath ) && fs.statSync( viewPath ).isFile() ) return viewPath;
+		
+		console.log( viewPath );
+
+		return null;
 	}
 };

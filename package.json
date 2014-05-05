@@ -26,9 +26,7 @@
   "keywords": [
     "cartero"
   ],
-  "dependencies": {
-    "express": "~3.4.8"
-  },
+  "dependencies": {},
   "devDependencies": {
     "cartero-node-hook": "^0.2.1",
     "express": "^3.4.8",
