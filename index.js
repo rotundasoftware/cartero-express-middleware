@@ -23,10 +23,10 @@ module.exports = function( hook, opts ) {
 
 		// for each request, wrap the render function so that we can execute our own code 
 		// first to populate the `cartero_js`, `cartero_css`
-		res.render = function( viewName, options, parcelPath, cb ) {
+		res.render = function( viewName, options, entryPointPath, cb ) {
 			if( ! options ) options = {};
 
-			if( ! parcelPath ) {
+			if( ! entryPointPath ) {
 				// try to find the absolute path of the template by resolving it against the views folder
 				var viewAbsolutePath = findAbsoluteViewPath( viewName, app );
 				if( ! viewAbsolutePath ) {
@@ -34,12 +34,12 @@ module.exports = function( hook, opts ) {
 					return;
 				}
 
-				parcelPath = path.dirname( viewAbsolutePath );
+				entryPointPath = path.join( path.dirname( viewAbsolutePath ), 'index.js' );
 			}
 			else
-				parcelPath = path.resolve( app.get( 'views' ), parcelPath );
+				entryPointPath = path.resolve( app.get( 'views' ), entryPointPath );
 
-			opts.populateRes( parcelPath, hook, res, function( err ) {
+			opts.populateRes( entryPointPath, hook, res, function( err ) {
 				if( err ) return next( err );
 
 				oldRender.call( res, viewName, options, cb );
@@ -49,19 +49,15 @@ module.exports = function( hook, opts ) {
 		next();
 	};
 
-	function populateResDefault( parcelPath, hook, res, cb ) {
-		hook.getParcelTags( parcelPath, function( err, scriptTags, styleTags ) {
+	function populateResDefault( entryPointPath, hook, res, cb ) {
+		hook.getTagsForEntryPoint( entryPointPath, function( err, scriptTags, styleTags ) {
 			if( err ) {
-				console.log( 'Could not find or load parcel at ' + parcelPath );
-				return cb(); // parcel probably does not exist. not a bid deal
+				console.log( 'Could not find or load assets for entry point ' + entryPointPath );
+				return cb(); // parcel probably does not exist. likely not a big deal
 			}
 
 			res.locals.cartero_js = scriptTags;
 			res.locals.cartero_css = styleTags;
-			res.locals.cartero_url = function( filePath ) {
-				filePath = path.resolve( parcelPath, filePath );
-				return hook.getAssetUrl( filePath );
-			};
 
 			return cb();
 		} );
@@ -89,8 +85,6 @@ module.exports = function( hook, opts ) {
 		// <path>/index.<engine>
 		viewPath = path.join(path.dirname(viewPath), path.basename(viewPath, ext), 'index' + ext);
 		if( existsSync( viewPath ) && fs.statSync( viewPath ).isFile() ) return viewPath;
-		
-		console.log( viewPath );
 
 		return null;
 	}

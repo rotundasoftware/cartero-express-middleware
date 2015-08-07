@@ -4,7 +4,6 @@ Express middleware for [cartero](https://github.com/rotundasoftware/cartero). Ov
 
 * `res.locals.cartero_js` is populated with the `script` tags for to load the js for the parcel.
 * `res.locals.cartero_css` is populated with the `link` tags for to load the css for the parcel.
-* `res.locals.cartero_url` is set to a function that takes a single argument, the path of an asset (relative to the parcel), and resolves it to the asset's url.
 
 The path of the parcel defaults to the directory of the view that is being rendered, so if you use your views folder to hold your parcels as recommended in the [cartero docs](https://github.com/rotundasoftware/cartero#packages-and-parcels) and [tutorial](https://github.com/rotundasoftware/cartero-tutorial), the variables are set to the appropriate values for parcel of the view being rendered.
 
@@ -59,14 +58,6 @@ html(lang="en")
     body
         h1 People List
         // ...
-```
-
-Image urls (or the urls of other assets) can be found usign the `cartero_url` function:
-
-```
-body
-        h1 People List
-        img(src=cartero_url('./my-image.png'))
 ```
 
 ## Contributors
